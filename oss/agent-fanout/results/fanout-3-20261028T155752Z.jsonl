@@ -1,0 +1,3 @@
+{"agent":2,"ok":true,"last_step":"done","busy_retries":0,"ready_s":47.0,"work_s":3.4,"delete_s":0.8,"total_s":51.2,"foreign_columns":""}
+{"agent":3,"ok":true,"last_step":"done","busy_retries":0,"ready_s":48.4,"work_s":3.6,"delete_s":0.9,"total_s":52.9,"foreign_columns":""}
+{"agent":1,"ok":true,"last_step":"done","busy_retries":0,"ready_s":48.4,"work_s":3.6,"delete_s":0.9,"total_s":52.9,"foreign_columns":""}

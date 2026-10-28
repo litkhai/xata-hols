@@ -1,0 +1,6 @@
+{"agent":3,"ok":false,"last_step":"create+delete","busy_retries":0,"ready_s":3.3,"work_s":0.1,"delete_s":1.0,"total_s":4.4,"foreign_columns":""}
+{"agent":5,"ok":true,"last_step":"done","busy_retries":0,"ready_s":51.4,"work_s":4.2,"delete_s":1.2,"total_s":56.8,"foreign_columns":""}
+{"agent":1,"ok":true,"last_step":"done","busy_retries":0,"ready_s":51.6,"work_s":4.6,"delete_s":1.0,"total_s":57.2,"foreign_columns":""}
+{"agent":4,"ok":true,"last_step":"done","busy_retries":0,"ready_s":52.5,"work_s":5.0,"delete_s":0.7,"total_s":58.3,"foreign_columns":""}
+{"agent":2,"ok":true,"last_step":"done","busy_retries":0,"ready_s":52.7,"work_s":5.4,"delete_s":1.0,"total_s":59.1,"foreign_columns":""}
+{"agent":6,"ok":true,"last_step":"done","busy_retries":0,"ready_s":95.7,"work_s":3.5,"delete_s":0.7,"total_s":100.0,"foreign_columns":""}

@@ -1,0 +1,65 @@
+# gitleaks configuration for xata-hols (rules copied from clickhouse-managed-postgres-hols)
+#
+# This repository is public and every lab talks to a database, so connection
+# details are the thing most likely to be committed by accident. The rules below
+# extend the default set with Postgres and Xata shapes; the allowlist keeps
+# documented placeholders and synthetic demo data from failing every run.
+#
+# Local use:   gitleaks detect  --config .gitleaks.toml --no-banner --redact
+# Staged only: gitleaks protect --staged --config .gitleaks.toml --no-banner
+
+[extend]
+useDefault = true
+
+
+
+[[rules]]
+id = "postgres-password-assignment"
+description = "Non-empty Postgres password assigned in code or config"
+regex = '''(?i)(PGPASSWORD|POSTGRES_PASSWORD|PG_PASSWORD|postgres[_-]?password)\s*[:=]\s*["']?[^"'\s$<{}-][^"'\s$<{}]{7,}["']?'''
+tags = ["postgres", "credential"]
+
+[[rules]]
+id = "postgres-connection-uri"
+description = "Postgres connection URI with an inline password"
+regex = '''postgres(ql)?://[A-Za-z0-9_.-]+:[^@\s/"']{6,}@[A-Za-z0-9_.-]+'''
+tags = ["postgres", "credential"]
+
+
+
+
+[[rules]]
+id = "xata-api-key"
+description = "Xata API key (CLI and control-plane REST API)"
+# Keys print as xau_ followed by 33 characters (create_dev_api_key, 2026-10-28).
+regex = '''\bxau_[A-Za-z0-9]{20,}\b'''
+tags = ["xata", "credential"]
+
+[allowlist]
+description = "Placeholders, documented demo values and synthetic datasets"
+# Test the patterns below against the whole matched text, not just the captured
+# secret, so `CLICKHOUSE_PASSWORD='your-password'` is recognised as a template.
+regexTarget = "match"
+
+paths = [
+    '''\.example$''',
+    '''\.template$''',
+    '''(^|/)\.gitleaks\.toml$''',
+]
+
+regexes = [
+    # placeholder shapes used throughout the docs
+    '''<[A-Za-z_ -]+>''',
+    '''(?i)(your|example|placeholder|changeme|change_me|dummy|sample|xxx+|redacted)''',
+    '''\$\{?[A-Za-z_][A-Za-z0-9_]*(:-[^}]*)?\}?''',
+    # local-only endpoints. Not 127.0.0.1: the local gateway serves every branch at
+    # <branch-id>.127.0.0.1.nip.io with a real password, and those must still be caught.
+    '''localhost''',
+    # the standard AWS documentation account id
+    '''123456789012''',
+    # Postgres' own default credential, used by the local source container of
+    # the anonymized-clone lab, which listens on 127.0.0.1 only. Anchored to the end of the
+    # match so a real password in the same field is still reported.
+    '''[:=]\s*["']?postgres["']?$''',
+    '''postgres(ql)?://postgres:postgres@''',
+]

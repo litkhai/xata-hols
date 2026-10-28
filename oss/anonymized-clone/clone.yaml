@@ -1,0 +1,26 @@
+# Anonymisation rules for `xata clone start --config clone.yaml`.
+# Written by hand: `xata clone config --mode auto` produced no rules for this schema
+# (2026-10-28, CLI 1.18.0); detection needs --mode ai, which sends the schema to an LLM.
+# Transformer names and parameters: pgstream docs/transformers.md (read at 0a58e63).
+transformations:
+  validation_mode: relaxed
+  table_transformers:
+    - schema: public
+      table: users
+      column_transformers:
+        email:
+          name: neosync_email
+          parameters:
+            preserve_domain: true
+            preserve_length: false
+        full_name:
+          name: neosync_fullname
+          parameters:
+            preserve_length: false
+        phone:
+          name: phone_number
+          parameters:
+            prefix: "010-"
+            min_length: 13
+            max_length: 13
+            generator: deterministic

@@ -1,0 +1,14 @@
+# Generated with `xata roll convert` from two ALTER TABLE statements, then the
+# `up` expression filled in (convert leaves a TODO there).
+operations:
+- rename_column:
+    from: full_name
+    table: users
+    to: display_name
+- add_column:
+    column:
+      name: email_domain
+      nullable: true
+      type: text
+    table: users
+    up: split_part(email, '@', 2)

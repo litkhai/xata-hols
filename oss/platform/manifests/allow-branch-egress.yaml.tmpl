@@ -1,0 +1,30 @@
+# Local-only workaround (kind v0.33, kindnet enforces NetworkPolicy).
+# branch-operator gives every branch a policy that allows egress only to its own
+# pods and DNS (services/branch-operator/pkg/reconciler/resources/resources.go,
+# NetworkPolicySpec). Policies are additive, so this one adds back the two
+# destinations a branch needs and keeps branches isolated from each other:
+#   - the API server, for the CNPG instance manager and the scale-to-zero sidecar
+#   - RustFS, the local S3 store that the immediate backup of every branch writes to
+# up.sh fills in ${API_IP} and ${API_PORT} from the kubernetes EndpointSlice.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: hols-allow-branch-egress
+  namespace: xata-clusters
+spec:
+  podSelector: {}
+  policyTypes: [Egress]
+  egress:
+  - to:
+    - ipBlock:
+        cidr: ${API_IP}/32
+    ports:
+    - port: ${API_PORT}
+      protocol: TCP
+  - to:
+    - podSelector:
+        matchLabels:
+          app: rustfs-eu
+    ports:
+    - port: 9000
+      protocol: TCP

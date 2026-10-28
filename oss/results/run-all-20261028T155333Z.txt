@@ -1,0 +1,77 @@
+date: 2026-10-28T15:53:33Z
+xata: f197e7bad539a81b424018765ee4e8799ed184f0
+cli:  {"CLIVersion":"1.18.0","pgrollVersion":"0.16.3","pgstreamVersion":"1.5.0","bunVersion":"1.3.14"}
+kind: kind v0.33.0 go1.27.0 darwin/arm64 · k8s v1.37.0
+docker memory: 15969 MiB
+postgres: PostgreSQL 18.6 (Debian 18.6-1.pgdg12+2) on aarch64-unknown-linux-gnu, compiled by gcc (Debian 12.2.0-14+deb12u1) 12.2.0, 64-bit
+== ./oss/branching/measure-branch.sh lab-measure base
+{"child":"lab-measure","parent":"base","parent_db_bytes":51992255,"api_s":1.2,"snapshot_ready_s":4.7,"pvc_bound_s":6.0,"branch_ready_s":35.4,"first_query_s":36.5}
+== ./oss/branching/run.sh
+PASS S3 child equals parent (300000:86c8e9d784eac27f891d87df95723f3f)
+PASS S4 parent does not see child update (0)
+PASS S4 parent does not see child table (t)
+PASS S4 child does not see parent table (t)
+PASS S5 grandchild inherits child state (1000)
+PASS S5 grandchild answers after its parent is deleted (300000)
+INFO tree after deleting lab-child:
+     base
+     lab-grandchild
+     main
+== ./oss/pgroll-migrations/run.sh
+ SUCCESS  Initialization complete
+ SUCCESS  Baseline created successfully. Placeholder migration "/var/folders/v9/82f46m_919vcwcchb7nrzbnh0000gn/T/tmp.LRtADKlh9p/00_baseline.yaml" written
+ SUCCESS  New version of the schema available under the postgres "public_01_display_name_email_domain" schema
+INFO start (backfill of 100000 rows) took 2.6s
+PASS S7 new schema sees an old-client write, column derived (Old Client/legacy.test)
+PASS S7 old schema sees a new-client write (New Client)
+PASS S7 existing rows backfilled (0)
+ SUCCESS  Migration successful!
+INFO complete took 1.3s
+PASS S7 public has only the new shape (created_at,display_name,email,email_domain,id,phone)
+PASS S7 parent unchanged (created_at,email,full_name,id,phone)
+== ./oss/serverless-sql/query.sh base select count(*) as users from users -w  HTTP %{http_code} %{time_total}s
+{"command":"SELECT","fields":[{"columnID":0,"dataTypeID":20,"dataTypeModifier":-1,"dataTypeSize":8,"format":"text","name":"users","tableID":0}],"rowAsArray":false,"rowCount":1,"rows":[{"users":"100000"}]}
+ HTTP 200 0.091085s
+== ./oss/anonymized-clone/run.sh
+INFO clone took 3.2s; warnings: 3
+PASS S10 users copied (100000)
+PASS S10 orders copied (300000)
+PASS S10 no email left as it was (0)
+PASS S10 email domain kept (0)
+PASS S10 no name left as it was (0)
+PASS S10 no phone left as it was (0)
+PASS S10 emails still unique (100000)
+PASS S10 order amounts untouched (74987080.14)
+PASS S10 foreign keys intact (0)
+INFO id 42 before: user42@example.com | Park Hayun | 010-0042-0294
+INFO id 42 after:  cd9a826e9e654bc78dd6a4eb228eb26c@example.com | Jose Mary Vera Perez | 010-986763646
+== ./oss/agent-fanout/fanout.sh 3
+{"agent":2,"ok":true,"last_step":"done","busy_retries":0,"ready_s":47.0,"work_s":3.4,"delete_s":0.8,"total_s":51.2,"foreign_columns":""}
+{"agent":3,"ok":true,"last_step":"done","busy_retries":0,"ready_s":48.4,"work_s":3.6,"delete_s":0.9,"total_s":52.9,"foreign_columns":""}
+{"agent":1,"ok":true,"last_step":"done","busy_retries":0,"ready_s":48.4,"work_s":3.6,"delete_s":0.9,"total_s":52.9,"foreign_columns":""}
+{"agents": 3, "succeeded": 3, "wall_s": 54.0, "ready_s_median": 48.4, "ready_s_max": 48.4, "base_schema_unchanged": true}
+== env RETRY_BUSY=0 ./oss/agent-fanout/fanout.sh 6
+{"agent":3,"ok":false,"last_step":"create+delete","busy_retries":0,"ready_s":3.3,"work_s":0.1,"delete_s":1.0,"total_s":4.4,"foreign_columns":""}
+{"agent":5,"ok":true,"last_step":"done","busy_retries":0,"ready_s":51.4,"work_s":4.2,"delete_s":1.2,"total_s":56.8,"foreign_columns":""}
+{"agent":1,"ok":true,"last_step":"done","busy_retries":0,"ready_s":51.6,"work_s":4.6,"delete_s":1.0,"total_s":57.2,"foreign_columns":""}
+{"agent":4,"ok":true,"last_step":"done","busy_retries":0,"ready_s":52.5,"work_s":5.0,"delete_s":0.7,"total_s":58.3,"foreign_columns":""}
+{"agent":2,"ok":true,"last_step":"done","busy_retries":0,"ready_s":52.7,"work_s":5.4,"delete_s":1.0,"total_s":59.1,"foreign_columns":""}
+{"agent":6,"ok":true,"last_step":"done","busy_retries":0,"ready_s":95.7,"work_s":3.5,"delete_s":0.7,"total_s":100.0,"foreign_columns":""}
+{"agents": 6, "succeeded": 5, "wall_s": 100.6, "ready_s_median": 52.5, "ready_s_max": 95.7, "base_schema_unchanged": true}
+== env RETRY_BUSY=5 ./oss/agent-fanout/fanout.sh 6
+{"agent":5,"ok":false,"last_step":"wait-ready","busy_retries":1,"ready_s":807.3,"work_s":0.1,"delete_s":21.2,"total_s":828.5,"foreign_columns":""}
+{"agent":6,"ok":true,"last_step":"done","busy_retries":0,"ready_s":807.3,"work_s":39.1,"delete_s":8.2,"total_s":854.6,"foreign_columns":""}
+{"agent":1,"ok":true,"last_step":"done","busy_retries":0,"ready_s":879.2,"work_s":23.3,"delete_s":1.9,"total_s":904.4,"foreign_columns":""}
+{"agent":2,"ok":true,"last_step":"done","busy_retries":0,"ready_s":903.4,"work_s":6.1,"delete_s":0.9,"total_s":910.4,"foreign_columns":""}
+{"agent":4,"ok":true,"last_step":"done","busy_retries":0,"ready_s":963.3,"work_s":4.6,"delete_s":1.1,"total_s":969.0,"foreign_columns":""}
+{"agent":3,"ok":true,"last_step":"done","busy_retries":0,"ready_s":1047.0,"work_s":12.0,"delete_s":1.9,"total_s":1060.9,"foreign_columns":""}
+{"agents": 6, "succeeded": 5, "wall_s": 1061.6, "ready_s_median": 903.4, "ready_s_max": 1047.0, "base_schema_unchanged": true}
+== ./oss/scale-to-zero/run.sh
+16:19:04 last query; scale-to-zero: {'enabled': True, 'inactivityPeriodMinutes': 5}
+16:19:05 +0s pods=1 sidecar=Starting scale to zero plugin sidecar
+16:20:06 +61s pods=1 sidecar=1
+16:21:07 +122s pods=1 sidecar=0
+16:25:02 +357s pods=1 sidecar=setting hibernation on branch
+16:25:12 +367s pods=0 sidecar=-
+PASS S6 hibernated 367s after the last query
+PASS S6 first query woke the branch in 16.0s (rows: 300000)

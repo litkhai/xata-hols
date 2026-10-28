@@ -1,0 +1,6 @@
+{"agent":6,"ok":true,"last_step":"done","busy_retries":0,"ready_s":57.3,"work_s":4.2,"delete_s":0.9,"total_s":62.4,"foreign_columns":""}
+{"agent":1,"ok":true,"last_step":"done","busy_retries":0,"ready_s":73.0,"work_s":4.8,"delete_s":0.8,"total_s":78.6,"foreign_columns":""}
+{"agent":3,"ok":true,"last_step":"done","busy_retries":0,"ready_s":73.2,"work_s":5.1,"delete_s":0.9,"total_s":79.3,"foreign_columns":""}
+{"agent":4,"ok":true,"last_step":"done","busy_retries":0,"ready_s":73.3,"work_s":5.1,"delete_s":0.9,"total_s":79.3,"foreign_columns":""}
+{"agent":2,"ok":true,"last_step":"done","busy_retries":0,"ready_s":94.6,"work_s":8.0,"delete_s":0.8,"total_s":103.3,"foreign_columns":""}
+{"agent":5,"ok":true,"last_step":"done","busy_retries":1,"ready_s":102.6,"work_s":6.0,"delete_s":7.0,"total_s":115.7,"foreign_columns":""}
