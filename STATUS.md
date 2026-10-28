@@ -12,7 +12,7 @@ and `syntax` run only by hand (`gh workflow run checks.yml --ref <branch>`). Not
 
 ## Inventory
 
-7 labs in the README table (S1–S10); 0 single-language.
+7 labs in the README table (S1–S10); 0 single-language. All 7 publish notes-site cards (`web: true`, category `xata`, owner's choice 2026-10-28); `docs/labs.json` lists 7.
 
 ## Pins
 

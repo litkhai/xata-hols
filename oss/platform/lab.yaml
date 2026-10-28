@@ -1,3 +1,10 @@
-# Lab contract: ../../tools/lab.schema.md. Not published to the notes site (no `web` key) until the owner chooses.
+# Lab contract: ../../tools/lab.schema.md. Published to the notes site (owner's choice, 2026-10-28).
 target: oss
 verified_on: "xata f197e7b · CLI 1.18.0 · PostgreSQL 18.6 (2026-10-28)"
+web: true
+category: xata
+title_ko: "Xata OSS 기동과 엔진 확인"
+summary_ko: "kind와 tilt로 Xata 오픈소스를 올리고 CLI로 프로젝트를 만든 뒤, 엔진(PGDG 18.6), 확장 73개, 역할 권한을 확인합니다."
+title_en: "Xata OSS bring-up and engine check"
+summary_en: "Bring up open-source Xata on kind with tilt, create a project from the CLI, and check the engine (PGDG 18.6), 73 extensions and role rights."
+tags: [postgres, cloud-operations]

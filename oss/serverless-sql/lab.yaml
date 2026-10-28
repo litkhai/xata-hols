@@ -1,3 +1,10 @@
-# Lab contract: ../../tools/lab.schema.md. Not published to the notes site (no `web` key) until the owner chooses.
+# Lab contract: ../../tools/lab.schema.md. Published to the notes site (owner's choice, 2026-10-28).
 target: oss
 verified_on: "xata f197e7b · CLI 1.18.0 · PostgreSQL 18.6 (2026-10-28)"
+web: true
+category: xata
+title_ko: "HTTP로 SQL 실행"
+summary_ko: "gateway의 POST /sql에 브랜치 접속 문자열을 헤더로 보내 쿼리하고, 성공과 오류 응답 형식을 확인합니다."
+title_en: "SQL over HTTP"
+summary_en: "Query a branch through the gateway's POST /sql with its connection string in a header; check the success and error shapes."
+tags: [postgres]

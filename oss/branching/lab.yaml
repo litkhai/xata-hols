@@ -1,3 +1,10 @@
-# Lab contract: ../../tools/lab.schema.md. Not published to the notes site (no `web` key) until the owner chooses.
+# Lab contract: ../../tools/lab.schema.md. Published to the notes site (owner's choice, 2026-10-28).
 target: oss
 verified_on: "xata f197e7b · CLI 1.18.0 · PostgreSQL 18.6 (2026-10-28)"
+web: true
+category: xata
+title_ko: "브랜치 복사·격리·트리"
+summary_ko: "브랜치가 부모의 정확한 복사본인지, 양방향으로 격리되는지, 중간 브랜치를 지워도 손자가 사는지 확인하고 크기별 브랜치 시간을 잽니다."
+title_en: "Branch copy, isolation and tree"
+summary_en: "Check that a branch is an exact copy, that isolation holds both ways and that a grandchild survives its parent's deletion; time branches by size."
+tags: [postgres, benchmark]
