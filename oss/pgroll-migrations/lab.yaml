@@ -5,6 +5,6 @@ web: true
 category: xata
 title_ko: "브랜치에서 pgroll 무중단 마이그레이션"
 summary_ko: "xata roll로 컬럼 rename과 backfill이 있는 컬럼 추가를 진행하고, 진행 중에 구·신 스키마가 모두 읽기·쓰기 되는지 확인합니다."
-title_en: "Zero-downtime pgroll migration on a branch"
+title_en: "pgroll migration, no downtime"
 summary_en: "Run a rename and a backfilled new column with xata roll, and check that old and new schema both read and write mid-migration."
 tags: [postgres, migration]

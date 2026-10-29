@@ -5,6 +5,6 @@ web: true
 category: xata
 title_ko: "에이전트 fan-out — 에이전트마다 브랜치"
 summary_ko: "에이전트 N개가 동시에 브랜치를 만들고, 스키마를 바꾸고, 테스트하고, 버립니다. 프로젝트 잠금과 메모리 한계를 잽니다."
-title_en: "Agent fan-out — one branch per agent"
+title_en: "Agent fan-out: branch per agent"
 summary_en: "N agents at once branch, change the schema, test and throw the branch away; measures the project lock and the memory ceiling."
 tags: [postgres, ai-agents, benchmark]
