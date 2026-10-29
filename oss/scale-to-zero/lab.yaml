@@ -1,3 +1,10 @@
-# Lab contract: ../../tools/lab.schema.md. Not published to the notes site (no `web` key) until the owner chooses.
+# Lab contract: ../../tools/lab.schema.md. Published to the notes site (owner's choice, 2026-10-28).
 target: oss
 verified_on: "xata f197e7b · CLI 1.18.0 · PostgreSQL 18.6 (2026-10-28)"
+web: true
+category: xata
+title_ko: "scale-to-zero와 깨우기"
+summary_ko: "비활성 5분 뒤 브랜치가 hibernate되고 다음 접속으로 깨어나는 시간을 잽니다. idle 연결 하나가 브랜치를 깨어 있게 하는 경우도 다룹니다."
+title_en: "Scale-to-zero and wake"
+summary_en: "Time hibernation after 5 idle minutes and the wake on the next connection, and see how one idle connection keeps a branch awake."
+tags: [postgres, cloud-operations]
