@@ -32,7 +32,10 @@ Change a row only together with a re-run.
 |---|---|---|
 | 2026-10-28 | First run, scenario by scenario, while the scripts were written | S1–S10 passed. Four findings (root README) |
 | 2026-10-28 15:37–16:25 UTC | Clean run: `down.sh`, `up.sh` (16 min 31 s), `run-all.sh` (32 min 0 s) — [log](oss/results/run-all-20261028T155333Z.txt) | ALL LABS PASSED. One N=6 fan-out run stalled for about 15 min on node memory (5/6); a repeat at 16:28 gave 6/6 in 116 s (`oss/agent-fanout/README.md`) |
+| 2026-10-30 | `oss/branching/cow-probe.sh` (Docker only, no cluster) — [output](oss/branching/results/cow-probe-2026-10-30.txt) | No dm-thin / dm-snapshot on kernel 7.0.14-linuxkit, so no LVM CoW driver. 1.4 GB: `tar` round trip 30.4–30.6 s, `cp --reflink` 0.03 s (btrfs, XFS) |
 
 ## Open work
+
+**Correction 2026-10-30:** the claim that CLI 1.18.0 does not retry a project-busy error was wrong. Its API client retries a 429 with `Retry-After` up to 3 attempts, about 2 s (#5). The measurements are unchanged.
 
 Tracked as issues — [all open](https://github.com/litkhai/xata-hols/issues).
