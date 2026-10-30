@@ -15,7 +15,8 @@ step="create"; ok=true
 # Branch creation takes a per-project advisory lock without waiting
 # (services/projects/branch/create.go, TryAcquireProjectLock), so concurrent creates
 # in one project can fail with "project … is busy; retry later". RETRY_BUSY=N retries
-# that error up to N times with a growing delay; 0 (the default) shows the raw behaviour.
+# that error up to N times with a growing delay; 0 (the default) leaves only the CLI's own retry
+# (@xata.io/api 0.1.28: a 429 with Retry-After, 3 attempts in all, about 2 s).
 retries=0
 t0=$(ts)
 while :; do

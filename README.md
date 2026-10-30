@@ -51,7 +51,10 @@ cluster, exactly as upstream's README brings it up, plus three local adjustments
    ([manifest](oss/platform/manifests/allow-branch-egress.yaml.tmpl)).
 2. **Concurrent branch creates in one project can fail.** Creation takes a per-project advisory lock
    without waiting (`TryAcquireProjectLock`, `services/projects/branch/create.go`), so a parallel
-   create returns `project … is busy; retry later`. The CLI does not retry. Agents must.
+   create gets HTTP 429 `project … is busy; retry later` with `Retry-After: 1`. CLI 1.18.0 does retry
+   it: its API client (`@xata.io/api` 0.1.28, `src/retry.ts`) makes up to 3 attempts, about 2 s in all.
+   That can end before the lock is released. In both N=6 runs, one create still failed after 3.3–3.5 s.
+   Agents need a longer retry of their own. *(Corrected 2026-10-30: an earlier version said the CLI does not retry.)*
 3. **Memory is the density limit.** Each `xata.micro` branch requests about 1 GiB (924 Mi Postgres +
    100 Mi pooler). With the platform taking about 7 GiB of requests, a 16 GiB node holds only a few branches at once. More
    agents than that wait for a slot, and start one after another rather than in parallel. Each new branch's
@@ -61,6 +64,8 @@ cluster, exactly as upstream's README brings it up, plus three local adjustments
    restores with `tar zxvf`, so branch time grows with data size. The same driver's snapshot is not
    atomic: one child of a parent with recent writes could not boot
    (`PANIC: could not locate a valid checkpoint record`). The labs run `CHECKPOINT` on the parent first.
+   A CoW driver cannot run on Docker Desktop's kernel (no dm-thin), and OSS has no `XVolClone` storage.
+   A reflink copy of 1.4 GB took 0.03 s against 30 s for the `tar` round trip ([branching](oss/branching/#could-cow-run-here-2026-10-30)).
 
 ### Prerequisites
 
@@ -147,8 +152,10 @@ What these labs change on upstream's local deployment, and why:
    정책 하나를 추가하면 두 문제가 모두 풀립니다([manifest](oss/platform/manifests/allow-branch-egress.yaml.tmpl)).
 2. **같은 프로젝트에서 브랜치를 동시에 만들면 실패할 수 있습니다.** 생성은 프로젝트 단위 advisory lock을
    기다리지 않고 한 번만 시도합니다(`TryAcquireProjectLock`, `services/projects/branch/create.go`). 그래서
-   동시에 생성하면 `project … is busy; retry later`가 돌아옵니다. CLI는 재시도하지 않으므로 에이전트가
-   재시도해야 합니다.
+   동시에 생성하면 `Retry-After: 1`과 함께 HTTP 429 `project … is busy; retry later`가 돌아옵니다. CLI 1.18.0은
+   이것을 재시도합니다. API 클라이언트(`@xata.io/api` 0.1.28, `src/retry.ts`)가 최대 3번 시도하는데, 기다리는 시간은 모두 합해 약 2초입니다.
+   이 시간은 잠금이 풀리기 전에 끝날 수 있습니다. N=6 실행 두 번 모두 생성 하나가 3.3–3.5초 만에 실패했습니다.
+   에이전트는 이보다 긴 재시도를 직접 해야 합니다. *(2026-10-30 정정: 이전 판은 CLI가 재시도하지 않는다고 적었습니다.)*
 3. **밀도의 한계는 메모리입니다.** `xata.micro` 브랜치 하나가 약 1 GiB를 요청합니다(Postgres 924 Mi와
    pooler 100 Mi). 플랫폼이 요청량 약 7 GiB를 차지하므로, 16 GiB 노드에는 브랜치가 몇 개밖에 동시에
    올라가지 않습니다. 그보다 많은 에이전트는 자리가 날 때까지 기다리고, 병렬이 아니라 차례로 시작합니다.
@@ -158,6 +165,8 @@ What these labs change on upstream's local deployment, and why:
    `tar zxvf`로 복원합니다. 그래서 브랜치 시간이 데이터 크기에 비례합니다. 같은 이유로 스냅샷이 원자적이지
    않습니다. 최근 쓰기가 있던 부모에서 만든 자식 하나가 부팅하지 못했습니다
    (`PANIC: could not locate a valid checkpoint record`). 그래서 실습은 브랜치 전에 부모에서 `CHECKPOINT`를 실행합니다.
+   Docker Desktop 커널에서는 CoW 드라이버를 돌릴 수 없고(dm-thin 없음), OSS에는 `XVolClone` 스토리지가 없습니다.
+   1.4 GB를 reflink로 복사하면 0.03초, `tar`로 묶고 풀면 30초였습니다([branching](oss/branching/#여기서-cow를-돌릴-수-있나2026-10-30)).
 
 ### 준비물
 

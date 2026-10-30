@@ -40,8 +40,12 @@ Every successful agent saw only its own column, and `base` was unchanged after e
   `acquire project lock: project [prj_…] is busy; retry later` 3.5 s in. Branch creation holds a
   per-project PostgreSQL advisory lock around provisioning, taken without waiting
   (`TryAcquireProjectLock`, `services/projects/branch/create.go`; the API adds a `Retry-After`
-  header). The CLI does not retry, so the agent's harness has to. In the run with retries enabled,
-  no agent needed one: the collision depends on timing.
+  header, `Retry-After: 1`). CLI 1.18.0's API client (`@xata.io/api` 0.1.28, `src/retry.ts`) retries a
+  429 that carries `Retry-After`, even for a POST, up to 3 attempts in all. That is about 2 s of waiting,
+  which fits the 3.3–3.5 s after which the create failed. The lock was held longer than that, so the
+  agent's harness needs a longer retry of its own (`RETRY_BUSY`). In the run with retries enabled, no
+  agent needed one: the collision depends on timing. *(Corrected 2026-10-30: an earlier version said the
+  CLI does not retry.)*
 - **Memory.** Up to 3 agents, branches became healthy in about 45 s, about the same as a single one. At 6
   they finished one after another (54, 66, 74, 85, 96 s). Each `xata.micro` branch requests 1 GiB, and
   with `main`, `base` and one more branch already up, the node had 75% of its 16 GiB requested
@@ -98,8 +102,11 @@ Xata는 브랜치를 AI 에이전트용 샌드박스로 내세웁니다. 에이�
 - **프로젝트 잠금.** 실패한 에이전트는 3.5초 만에
   `acquire project lock: project [prj_…] is busy; retry later`를 받았습니다. 브랜치 생성은 프로비저닝하는
   동안 프로젝트 단위 PostgreSQL advisory lock을 잡는데, 이 잠금을 기다리지 않고 한 번만 시도합니다
-  (`TryAcquireProjectLock`, `services/projects/branch/create.go`. API는 `Retry-After` 헤더를 붙임). CLI가
-  재시도하지 않으므로 에이전트를 돌리는 쪽이 재시도해야 합니다. 재시도를 켠 실행에서는 실제로 재시도한
+  (`TryAcquireProjectLock`, `services/projects/branch/create.go`. API는 `Retry-After: 1` 헤더를 붙임).
+  CLI 1.18.0의 API 클라이언트(`@xata.io/api` 0.1.28, `src/retry.ts`)는 `Retry-After`가 붙은 429를 POST라도
+  최대 3번 시도합니다. 기다리는 시간은 약 2초로, 생성이 3.3–3.5초 만에 실패한 것과 맞습니다. 잠금은 그보다
+  오래 잡혀 있었으므로, 에이전트를 돌리는 쪽이 더 긴 재시도를 직접 해야 합니다(`RETRY_BUSY`).
+  *(2026-10-30 정정: 이전 판은 CLI가 재시도하지 않는다고 적었습니다.)* 재시도를 켠 실행에서는 실제로 재시도한
   에이전트가 없었습니다. 충돌 여부는 타이밍에 달려 있습니다.
 - **메모리.** 3개까지는 브랜치가 하나일 때와 비슷하게 약 45초에 healthy가 됐습니다. 6개에서는 차례로
   끝났습니다(54, 66, 74, 85, 96초). `xata.micro` 브랜치 하나가 1 GiB를 요청합니다. `main`, `base`와 브랜치

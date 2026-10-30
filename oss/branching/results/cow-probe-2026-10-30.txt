@@ -1,0 +1,7 @@
+date 2026-10-30T05:08:50Z
+docker Docker Desktop · kernel 7.0.14-linuxkit · 12 CPU · 16745562112 B
+dm targets: crypt striped linear error 
+modprobe dm_thin_pool: not available
+modprobe dm_snapshot: not available
+btrfs 1400 MiB in 1400 files: tar czf+zxf 30.55 s · cp --reflink 0.03 s
+xfs 1400 MiB in 1400 files: tar czf+zxf 30.38 s · cp --reflink 0.03 s
