@@ -38,4 +38,6 @@ Change a row only together with a re-run.
 
 **Correction 2026-10-30:** the claim that CLI 1.18.0 does not retry a project-busy error was wrong. Its API client retries a 429 with `Retry-After` up to 3 attempts, about 2 s (#5). The measurements are unchanged.
 
+**Upstream 2026-10-30:** Findings 1 and 2 reported as [xataio/xata#16](https://github.com/xataio/xata/issues/16) (branch NetworkPolicy egress) and [xataio/xata#17](https://github.com/xataio/xata/issues/17) (project lock, short CLI retry). Both open, no reply yet.
+
 Tracked as issues — [all open](https://github.com/litkhai/xata-hols/issues).
