@@ -55,8 +55,9 @@ replaced, and why, are in [`results/superseded/`](results/superseded/).
   `<branch>` hostname, and the gateway sends that to the Postgres primary. Only `<branch>-pooler`
   reaches PgBouncer (`services/gateway/session/proxy.go`, `resolver.go` `parseEndpoint`).
   - `xata.micro` has `max_connections = 50`. The first attempt gave each of 6 client processes up to
-    11 connections, and at C=50 it logged 180 `too many clients` / `remaining connection slots`
-    errors. This lab caps the client at 36 connections.
+    11 connections, and at C=50 it logged 195 connection errors: 180 `remaining connection slots are
+    reserved` and 15 `too many clients` ([log](results/superseded/sessions-first-attempt-stderr.txt)).
+    This lab caps the client at 36 connections.
   - PgBouncer's `default_pool_size` is 45 of those 50. After a busy pooler run, a direct connection
     failed until PgBouncer's idle server connections timed out (60 s). `run.sh` ends them before
     each run.
@@ -379,7 +380,8 @@ This lab is not part of `oss/run-all.sh`, because of its run time.
   gateway는 이를 Postgres primary로 보냅니다. `<branch>-pooler`일 때만 PgBouncer로 갑니다
   (`services/gateway/session/proxy.go`, `resolver.go`의 `parseEndpoint`).
   - `xata.micro`는 `max_connections = 50`입니다. 첫 시도에서는 클라이언트 프로세스 6개가 각자 연결을 최대
-    11개 잡았고, C=50에서 `too many clients` / `remaining connection slots` 오류가 180번 났습니다. 이 실습은
+    11개 잡았고, C=50에서 연결 오류가 195번 났습니다. `remaining connection slots are reserved`가 180번,
+    `too many clients`가 15번입니다([로그](results/superseded/sessions-first-attempt-stderr.txt)). 이 실습은
     클라이언트 연결을 36개로 제한합니다.
   - PgBouncer의 `default_pool_size`는 그 50개 중 45개입니다. pooler를 많이 쓴 실행 뒤에는, PgBouncer의 idle
     서버 연결이 시간 초과(60초)로 닫힐 때까지 직접 연결이 실패했습니다. `run.sh`는 실행마다 그 연결을 먼저 끊습니다.
