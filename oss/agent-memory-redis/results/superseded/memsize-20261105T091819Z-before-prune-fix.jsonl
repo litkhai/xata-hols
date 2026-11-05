@@ -1,0 +1,1 @@
+{"bytes": 193519616, "kind": "memsize", "memories": 50000, "system": "postgres", "tables": {"store": {"heap": 4669440, "indexes": 2457600}, "store_vectors": {"heap": 81928192, "indexes": 104464384}}, "utc": "2026-11-05T09:18:50Z"}

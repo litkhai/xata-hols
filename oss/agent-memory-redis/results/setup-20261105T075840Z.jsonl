@@ -1,0 +1,4 @@
+{"kind": "setup", "memories": 50000, "system": "postgres", "utc": "2026-11-05T07:59:17Z"}
+{"kind": "setup", "memories": 50000, "system": "redis", "utc": "2026-11-05T07:59:35Z"}
+{"hnsw.ef_search": "40", "kind": "recall", "queries": 500, "recall_at_10": 1.0, "recall_at_5": 1.0, "search_ms": {"max": 37.188, "mean": 2.285, "n": 500, "p50": 1.905, "p99": 10.291}, "system": "postgres", "utc": "2026-11-05T07:59:38Z"}
+{"kind": "recall", "queries": 500, "recall_at_10": 1.0, "recall_at_5": 1.0, "search_ms": {"max": 14.306, "mean": 1.11, "n": 500, "p50": 0.987, "p99": 2.356}, "system": "redis", "utc": "2026-11-05T07:59:40Z"}

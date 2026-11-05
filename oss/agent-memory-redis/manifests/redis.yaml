@@ -1,0 +1,64 @@
+# Redis for the comparison, in the same kind cluster as the Xata branch.
+# Limits match the branch: xata.micro is 924Mi + 100Mi pooler and 2 CPUs for Postgres.
+# AOF lives on a PVC, so a killed redis-server restarts from its own AOF (the crash test).
+# Durability (appendfsync) is set per run by bench/ctl.py; this file only sets the start state.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hols-bench
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+  namespace: hols-bench
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: standard
+  resources:
+    requests:
+      storage: 4Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: hols-bench
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: redis}
+  template:
+    metadata:
+      labels: {app: redis}
+    spec:
+      containers:
+      - name: redis
+        # Redis Open Source 8.10.3 (search, JSON, time series, bloom modules bundled), read 2026-11-05
+        image: redis:8.10.3@sha256:de1068af6f552240dfab67bcc9bfef99bfc60f776bb4580ef077ea4c8c97e848
+        args: ["--dir", "/data", "--appendonly", "yes", "--appendfsync", "everysec", "--save", "",
+               "--maxmemory", "900mb", "--maxmemory-policy", "noeviction"]
+        ports:
+        - containerPort: 6379
+        resources:
+          requests: {cpu: 250m, memory: 1Gi}
+          limits: {cpu: "2", memory: 1Gi}
+        readinessProbe:
+          exec: {command: ["redis-cli", "ping"]}
+          periodSeconds: 2
+        volumeMounts:
+        - {name: data, mountPath: /data}
+      volumes:
+      - name: data
+        persistentVolumeClaim: {claimName: redis-data}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: hols-bench
+spec:
+  selector: {app: redis}
+  ports:
+  - port: 6379
