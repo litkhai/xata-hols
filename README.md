@@ -6,8 +6,9 @@
 
 Self-test labs for the open-source [Xata](https://github.com/xataio/xata) platform: Postgres
 branching, scale-to-zero, pgroll schema migrations, SQL over HTTP, anonymized clones, and many
-parallel "agents" each working on their own branch. Everything runs on a laptop in a kind
-cluster, exactly as upstream's README brings it up, plus three local adjustments listed below.
+parallel "agents" each working on their own branch, and agent memory on a branch compared with Redis.
+Everything runs on a laptop in a kind cluster, exactly as upstream's README brings it up, plus the
+local adjustments listed below.
 
 ### What Xata OSS is (read from the source at the pinned commit)
 
@@ -39,6 +40,7 @@ cluster, exactly as upstream's README brings it up, plus three local adjustments
 | [oss/agent-fanout](oss/agent-fanout/) | S8 | N agents in parallel: branch → migrate → test → delete; the per-project lock and the memory ceiling |
 | [oss/serverless-sql](oss/serverless-sql/) | S9 | `POST /sql` on the gateway with the connection string in a header |
 | [oss/anonymized-clone](oss/anonymized-clone/) | S10 | `xata clone` from a plain Postgres into a branch with PII replaced on the way in |
+| [oss/agent-memory-redis](oss/agent-memory-redis/) | S11 | One LangGraph agent's checkpoints and long-term memory on a branch or on Redis; expiry, state rewritten every turn, `kill -9` |
 
 ### Findings
 
@@ -68,6 +70,15 @@ cluster, exactly as upstream's README brings it up, plus three local adjustments
    (`PANIC: could not locate a valid checkpoint record`). The labs run `CHECKPOINT` on the parent first.
    A CoW driver cannot run on Docker Desktop's kernel (no dm-thin), and OSS has no `XVolClone` storage.
    A reflink copy of 1.4 GB took 0.03 s against 30 s for the `tar` round trip ([branching](oss/branching/#could-cow-run-here-2026-10-30)).
+5. **The connection string `xata branch url` prints bypasses PgBouncer.** The gateway sends a plain
+   `<branch>` hostname straight to Postgres and only `<branch>-pooler` to the branch's PgBouncer
+   (`services/gateway/session/proxy.go`, `resolver.go` `parseEndpoint`). `xata.micro` has
+   `max_connections = 50`, so 50 agents with a few connections each fail with `too many clients`
+   unless they use the `-pooler` host or a smaller client pool ([agent-memory-redis](oss/agent-memory-redis/)).
+6. **The local overlay caps the SQL gateway at 200m CPU.** `kustomize/overlays/local` sets
+   `GOMAXPROCS=1` and a 200m limit; the chart ships 8 CPUs. At 200m the gateway was throttled and
+   capped LangGraph sessions at about 215 turns/s; at the chart's values the same run did 598
+   ([agent-memory-redis](oss/agent-memory-redis/), 2026-11-05).
 
 ### Prerequisites
 
@@ -95,6 +106,7 @@ What these labs change on upstream's local deployment, and why:
 | Keycloak at 1 instance instead of 2 | `up.sh` | Frees 2 GiB of requests. The labs log in with an API key |
 | `hols-allow-branch-egress` NetworkPolicy | `up.sh`, `manifests/` | Finding 1 |
 | `CHECKPOINT` on the parent before every branch | `env.sh` `new_branch` | Finding 4. `NO_CHECKPOINT=1` shows the raw behaviour |
+| SQL gateway at its chart's resources (`GOMAXPROCS=8`, CPU 8 / 4) | `agent-memory-redis/run.sh` `up`; `down` restores the overlay | Finding 6. Only while that lab runs |
 
 ### Repository checks
 
@@ -105,8 +117,8 @@ What these labs change on upstream's local deployment, and why:
 
 오픈소스 [Xata](https://github.com/xataio/xata) 플랫폼을 직접 검증하는 실습입니다. 다루는 기능은 Postgres
 브랜칭, scale-to-zero, pgroll 스키마 마이그레이션, HTTP SQL, 익명화 clone, 그리고 각자 브랜치에서 일하는
-병렬 "에이전트"입니다. 모두 노트북의 kind 클러스터에서 upstream README와 같은 방법으로 띄웁니다. 여기에
-아래에 적은 로컬 조정 세 가지를 더했습니다.
+병렬 "에이전트", 그리고 브랜치와 Redis에 둔 에이전트 메모리 비교입니다. 모두 노트북의 kind 클러스터에서
+upstream README와 같은 방법으로 띄웁니다. 여기에 아래에 적은 로컬 조정을 더했습니다.
 
 ### Xata OSS란 (고정한 커밋의 소스에서 확인)
 
@@ -141,6 +153,7 @@ What these labs change on upstream's local deployment, and why:
 | [oss/agent-fanout](oss/agent-fanout/) | S8 | 에이전트 N개 병렬 실행(브랜치 → 마이그레이션 → 테스트 → 삭제). 프로젝트 잠금과 메모리 한계 |
 | [oss/serverless-sql](oss/serverless-sql/) | S9 | 접속 문자열을 헤더에 넣어 gateway의 `POST /sql` 호출 |
 | [oss/anonymized-clone](oss/anonymized-clone/) | S10 | 일반 Postgres에서 브랜치로 `xata clone`하면서 개인정보 교체 |
+| [oss/agent-memory-redis](oss/agent-memory-redis/) | S11 | 같은 LangGraph 에이전트의 체크포인트와 장기 메모리를 브랜치 또는 Redis에 두고 비교. 만료, 매 턴 고쳐 쓰는 상태, `kill -9` |
 
 ### 발견 사항
 
@@ -171,6 +184,15 @@ What these labs change on upstream's local deployment, and why:
    (`PANIC: could not locate a valid checkpoint record`). 그래서 실습은 브랜치 전에 부모에서 `CHECKPOINT`를 실행합니다.
    Docker Desktop 커널에서는 CoW 드라이버를 돌릴 수 없고(dm-thin 없음), OSS에는 `XVolClone` 스토리지가 없습니다.
    1.4 GB를 reflink로 복사하면 0.03초, `tar`로 묶고 풀면 30초였습니다([branching](oss/branching/#여기서-cow를-돌릴-수-있나2026-10-30)).
+5. **`xata branch url`이 주는 연결 문자열은 PgBouncer를 거치지 않습니다.** gateway는 호스트가
+   `<branch>`이면 Postgres로 바로 보내고, `<branch>-pooler`일 때만 브랜치의 PgBouncer로 보냅니다
+   (`services/gateway/session/proxy.go`, `resolver.go`의 `parseEndpoint`). `xata.micro`는
+   `max_connections = 50`이라서, 에이전트 50개가 연결을 몇 개씩 잡으면 `too many clients`로 실패합니다.
+   `-pooler` 호스트를 쓰거나 클라이언트 pool을 줄여야 합니다([agent-memory-redis](oss/agent-memory-redis/)).
+6. **로컬 overlay는 SQL gateway를 CPU 200m으로 제한합니다.** `kustomize/overlays/local`이
+   `GOMAXPROCS=1`과 200m limit을 걸고, chart 기본값은 8 CPU입니다. 200m에서는 gateway가 throttling되어
+   LangGraph 세션이 약 215 turns/s에서 막혔고, chart 값에서는 같은 실행이 598 turns/s였습니다
+   ([agent-memory-redis](oss/agent-memory-redis/), 2026-11-05).
 
 ### 준비물
 
@@ -199,6 +221,7 @@ oss/platform/down.sh    # 클러스터 삭제
 | Keycloak 인스턴스 2개를 1개로 | `up.sh` | 요청량 2 GiB 확보. 실습은 API 키로 로그인 |
 | `hols-allow-branch-egress` NetworkPolicy 추가 | `up.sh`, `manifests/` | 발견 사항 1 |
 | 브랜치 만들기 전 부모에서 `CHECKPOINT` | `env.sh`의 `new_branch` | 발견 사항 4. `NO_CHECKPOINT=1`이면 원래 동작 |
+| SQL gateway를 chart 리소스로(`GOMAXPROCS=8`, CPU 8 / 4) | `agent-memory-redis/run.sh`의 `up`, `down`이 overlay 값으로 복원 | 발견 사항 6. 그 실습을 돌리는 동안만 |
 
 ### 저장소 검사
 

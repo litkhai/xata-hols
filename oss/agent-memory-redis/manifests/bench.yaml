@@ -1,0 +1,20 @@
+# The bench client: one pod that run.sh drives with `kubectl exec`.
+# Connection strings come from the hols-bench-pg Secret that run.sh writes; they are never printed.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bench
+  namespace: hols-bench
+  labels: {app: hols-bench}
+spec:
+  containers:
+  - name: bench
+    image: hols-agentmem-bench:local
+    imagePullPolicy: Never
+    envFrom:
+    - secretRef: {name: hols-bench-pg}
+    env:
+    - {name: REDIS_URL, value: "redis://redis.hols-bench.svc:6379/0"}
+    resources:
+      requests: {cpu: "2", memory: 1Gi}
+      limits: {cpu: "6", memory: 3Gi}

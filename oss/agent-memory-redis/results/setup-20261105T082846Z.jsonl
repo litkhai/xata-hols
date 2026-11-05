@@ -1,0 +1,8 @@
+{"kind": "setup", "memories": 50000, "system": "postgres", "utc": "2026-11-05T08:28:46Z"}
+{"kind": "setup", "memories": 50000, "system": "redis", "utc": "2026-11-05T08:28:47Z"}
+{"hnsw.ef_search": "40", "kind": "recall", "queries": 500, "recall_at_10": 1.0, "recall_at_5": 1.0, "search_ms": {"max": 15.18, "mean": 1.884, "n": 500, "p50": 1.738, "p99": 3.258}, "system": "postgres", "utc": "2026-11-05T08:28:49Z"}
+{"kind": "recall", "queries": 500, "recall_at_10": 1.0, "recall_at_5": 1.0, "search_ms": {"max": 9.481, "mean": 0.992, "n": 500, "p50": 0.907, "p99": 1.996}, "system": "redis", "utc": "2026-11-05T08:28:51Z"}
+{"backends_ended": 0, "kind": "pg_sync", "seen": ["on"], "utc": "2026-11-05T08:28:53Z", "wanted": "on"}
+{"aof_current_size": 136692852, "aof_enabled": 1, "appendfsync": "always", "appendonly": "yes", "auto-aof-rewrite-percentage": "0", "kind": "redis_config", "maxmemory": "943718400", "maxmemory-policy": "noeviction", "redis_version": "8.10.3", "save": "", "used_memory": 419706552, "used_memory_rss": 571875328, "utc": "2026-11-05T08:28:53Z"}
+{"by_part_per_session": {"checkpoint_blobs": 61440, "checkpoint_writes": 36618, "checkpoints": 49316, "store_vectors": 5652}, "bytes_per_session": 153027, "kind": "footprint", "path": "gateway", "sessions": 100, "system": "postgres", "turns": 16, "utc": "2026-11-05T08:29:24Z"}
+{"by_part_per_session": {"checkpoint": 714048, "checkpoint_latest": 141, "checkpoint_write": 61312, "store": 1600, "store_vectors": 18044, "write_keys_zset": 37019}, "bytes_per_session": 445937, "kind": "footprint", "path": "redis", "sessions": 100, "system": "redis", "turns": 16, "utc": "2026-11-05T08:29:35Z"}

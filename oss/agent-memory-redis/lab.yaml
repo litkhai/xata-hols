@@ -1,0 +1,8 @@
+# Lab contract: ../../tools/lab.schema.md. Not published to the notes site yet (owner's choice pending).
+target: oss
+category: xata
+title_ko: "에이전트 메모리 — Xata(Postgres)와 Redis"
+summary_ko: "같은 LangGraph 에이전트의 체크포인트와 장기 메모리를 Postgres와 Redis에 두고 비교합니다. 만료, 매 턴 고쳐 쓰는 상태, kill -9 후 잃는 쓰기도 잽니다."
+title_en: "Agent memory: Xata (Postgres) vs Redis"
+summary_en: "The same LangGraph agent keeps its checkpoints and long-term memory on Postgres or on Redis; also expiry, state rewritten every turn, and writes lost to kill -9."
+tags: [postgres, ai-agents, vector-search, benchmark]

@@ -1,7 +1,8 @@
 # STATUS.md
 
-**As of 2026-10-28** — repository created. Ten scenarios (S1–S10) run on a local kind cluster;
-the first run and a clean re-run from `oss/platform/up.sh` are recorded in each lab's README and below. `run-all.sh` changed after the clean run only in how it prints script paths in its log.
+**As of 2026-11-05** — eleven scenarios (S1–S11) run on a local kind cluster. S1–S10: the first run and
+a clean re-run from `oss/platform/up.sh` are recorded in each lab's README and below; `run-all.sh` changed after the clean run only in how it prints script paths in its log.
+S11 (`oss/agent-memory-redis`, #10) was run on its own after a fresh `up.sh`; it is not part of `run-all.sh`.
 
 ## CI
 
@@ -12,7 +13,7 @@ and `syntax` run only by hand (`gh workflow run checks.yml --ref <branch>`). Not
 
 ## Inventory
 
-7 labs in the README table (S1–S10); 0 single-language. All 7 publish notes-site cards (`web: true`, category `xata`, owner's choice 2026-10-28); `docs/labs.json` lists 7.
+8 labs in the README table (S1–S11); 0 single-language. The first 7 publish notes-site cards (`web: true`, category `xata`, owner's choice 2026-10-28); `docs/labs.json` lists 7. `oss/agent-memory-redis` has no `web` key yet (owner's choice pending).
 
 ## Pins
 
@@ -25,6 +26,8 @@ Change a row only together with a re-run.
 | Branch image | `postgres:18.6` → `ghcr.io/xataio/postgres-images/cnpg-postgres-plus:18.6` | `up.sh` `PG_VERSION` |
 | Source container | `postgres:18.6@sha256:979bccfd…` | `oss/anonymized-clone/run.sh` |
 | kind | v0.33.0 (Kubernetes v1.37.0) | local install |
+| Redis | `redis:8.10.3@sha256:de1068af…` (Redis Open Source 8.10.3, RediSearch 8.10.1) | `oss/agent-memory-redis/manifests/redis.yaml` |
+| Bench client | `python:3.12-slim@sha256:b18b261e…` (Python 3.12.16); langgraph 1.2.20, langgraph-checkpoint-postgres 3.2.0, langgraph-checkpoint-redis 0.6.0, psycopg 3.3.8, redis-py 8.1.0 | `oss/agent-memory-redis/bench/Dockerfile`, `requirements.txt` |
 
 ## Runs
 
@@ -33,6 +36,7 @@ Change a row only together with a re-run.
 | 2026-10-28 | First run, scenario by scenario, while the scripts were written | S1–S10 passed. Four findings (root README) |
 | 2026-10-28 15:37–16:25 UTC | Clean run: `down.sh`, `up.sh` (16 min 31 s), `run-all.sh` (32 min 0 s) — [log](oss/results/run-all-20261028T155333Z.txt) | ALL LABS PASSED. One N=6 fan-out run stalled for about 15 min on node memory (5/6); a repeat at 16:28 gave 6/6 in 116 s (`oss/agent-fanout/README.md`) |
 | 2026-10-30 | `oss/branching/cow-probe.sh` (Docker only, no cluster) — [output](oss/branching/results/cow-probe-2026-10-30.txt) | No dm-thin / dm-snapshot on kernel 7.0.14-linuxkit, so no LVM CoW driver. 1.4 GB: `tar` round trip 30.4–30.6 s, `cp --reflink` 0.03 s (btrfs, XFS) |
+| 2026-11-05 07:47–09:23 UTC | Fresh `up.sh` (kind cluster created, tilt ready in 346 s), then `oss/agent-memory-redis/run.sh` step by step — [results](oss/agent-memory-redis/results/) | 30 session runs, 4 kill, 6 expiry, 6 + 3 small-state, sizes: all completed. Two new findings (root README 5, 6). Runs replaced after fixes are kept in `results/superseded/` with the reason in their file names |
 
 ## Open work
 
