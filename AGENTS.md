@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> Harness: khai-harness core@d54058a · context public · bilingual yes
+> Harness: khai-harness core@28ca273 · context public · bilingual yes
 
 Instructions for coding agents working in this repository.
 
@@ -33,9 +33,11 @@ no links to labs that do not exist yet.
 - `docs/labs.json` is the notes-site export (`tools/lab.schema.md`). Never set `web` without the
   owner's choice for that lab.
 
-<!-- harness:core start — khai-harness core@d54058a · context public · 손으로 고치지 마세요 -->
+<!-- harness:core start — khai-harness core@28ca273 · context public · 손으로 고치지 마세요 -->
 **Context: public.** Public sources only — nothing from company connectors, internal hosts, internal wikis or
 private repositories, and no link to them. gitleaks must pass before every commit. Claims name what was run.
+
+Cursor/Grok: read `../khai-harness/runtime/cursor/README.md`; if `~/.config/khai-harness/active` is missing, say so.
 
 ## core — procedure for every repository and agent
 
