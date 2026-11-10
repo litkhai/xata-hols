@@ -93,7 +93,7 @@ local adjustments listed below.
 ```bash
 git config core.hooksPath .githooks
 oss/platform/up.sh      # ~25 min with a cold image cache, ~17 min warm
-oss/run-all.sh          # every lab in order: ~20–30 min (scale-to-zero alone waits ~7 min)
+oss/run-all.sh          # S1–S10 in order: ~20–30 min (scale-to-zero alone waits ~7 min); agent-memory-redis has its own run.sh
 oss/platform/down.sh    # delete the cluster
 ```
 
@@ -208,7 +208,7 @@ upstream README와 같은 방법으로 띄웁니다. 여기에 아래에 적은 
 ```bash
 git config core.hooksPath .githooks
 oss/platform/up.sh      # 이미지 캐시가 없으면 약 25분, 있으면 약 17분
-oss/run-all.sh          # 모든 실습을 순서대로 실행, 약 20–30분(scale-to-zero만 약 7분 대기)
+oss/run-all.sh          # S1–S10을 순서대로 실행, 약 20–30분(scale-to-zero만 약 7분 대기). agent-memory-redis는 자체 run.sh
 oss/platform/down.sh    # 클러스터 삭제
 ```
 
