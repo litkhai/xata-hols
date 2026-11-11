@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> Harness: khai-harness core@28ca273 · context public · bilingual yes
+> Harness: khai-harness core@cc48e1b · context public · bilingual yes
 
 Instructions for coding agents working in this repository.
 
@@ -33,7 +33,7 @@ no links to labs that do not exist yet.
 - `docs/labs.json` is the notes-site export (`tools/lab.schema.md`). Never set `web` without the
   owner's choice for that lab.
 
-<!-- harness:core start — khai-harness core@28ca273 · context public · 손으로 고치지 마세요 -->
+<!-- harness:core start — khai-harness core@cc48e1b · context public · 손으로 고치지 마세요 -->
 **Context: public.** Public sources only — nothing from company connectors, internal hosts, internal wikis or
 private repositories, and no link to them. gitleaks must pass before every commit. Claims name what was run.
 
@@ -74,7 +74,8 @@ Planned work, re-verification and follow-ups are **issues**; every change lands 
 **pull request** that references its issue (`Closes #N`). `STATUS.md` is a snapshot of the
 current state and links to the open issues instead of keeping its own to-do list. When you find
 something to do that you are not doing now, open an issue rather than writing it into a README
-or `STATUS.md`. Labels: `re-verify` (changed but not re-run), `enhancement`, `docs`, `ops`, `security`.
+or `STATUS.md`. A closing keyword goes only next to an issue the change finishes, in the PR body and in
+the commit messages (GitHub closes from both); a partial step says "part of #N". Labels: `re-verify` (changed but not re-run), `enhancement`, `docs`, `ops`, `security`.
 
 ### Model roles
 <!-- from: clickhouse-hols AGENTS.md "Model roles" (same text in the 4 split repos) + delegation economics (khai-harness #53, measured 2026-10-03) -->
